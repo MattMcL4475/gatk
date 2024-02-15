@@ -1,0 +1,32 @@
+steps:
+  # Start the Docker-in-Docker service with experimental features enabled directly
+  - id: 'setup-dind-experimental'
+    name: 'docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Enable experimental features on Docker daemon
+        echo '{"experimental": true}' | sudo tee /etc/docker/daemon.json
+        sudo service docker restart
+        # Start a Docker-in-Docker instance
+        docker run -d --privileged --name dind-service docker:dind --experimental
+        until docker -H tcp://localhost:2375 version; do sleep 1; done
+
+  # Use Docker commands with the DinD service
+  - id: 'build-and-push'
+    name: 'docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        export DOCKER_HOST=tcp://localhost:2375
+        docker build --squash -t ${_DOCKER_IMAGE} .
+        docker push ${_DOCKER_IMAGE}
+
+options:
+  machineType: 'N1_HIGHCPU_32'
+timeout: '1440s' # 24 hours
+
+substitutions:
+  _DOCKER_IMAGE: ''

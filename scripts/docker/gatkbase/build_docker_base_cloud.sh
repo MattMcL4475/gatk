@@ -18,14 +18,14 @@ fi
 
 IMAGE_VERSION=$1
 IMAGE_NAME="us.gcr.io/broad-dsde-methods/gatk-base-image-staging-area"
-DOCKER_IMAGE_TAG="${IMAGE_NAME}:gatkbase-${IMAGE_VERSION}"
+DOCKER_IMAGE="${IMAGE_NAME}:gatkbase-${IMAGE_VERSION}"
 
-gcloud builds submit --tag ${DOCKER_IMAGE_TAG} --timeout=24h --machine-type n1_highcpu_32
+gcloud builds submit --config=cloudbuild.yaml --substitutions=_DOCKER_IMAGE=${DOCKER_IMAGE}
 
 if [ $? -ne 0 ]; then
     echo "gcloud builds submit failed"
     exit 1
 fi
 
-echo "Successfully published image to staging area at ${DOCKER_IMAGE_TAG}"
+echo "Successfully published image to staging area at ${DOCKER_IMAGE}"
 exit 0
