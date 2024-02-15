@@ -27,5 +27,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Successfully published image to staging area at ${DOCKER_IMAGE_TAG}"
+echo "Successfully published image to staging area at ${DOCKER_IMAGE}"
 exit 0
